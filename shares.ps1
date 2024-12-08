@@ -7,16 +7,15 @@ $shares = Get-SmbShare | Where-Object { $_.Name -notin @('ADMIN$', 'C$', 'IPC$',
 # Loop through each share
 foreach ($share in $shares) {
     $sharePath = "\\localhost\$($share.Name)"
-
+    get-acl -path $sharePath | Out-File -FilePath $outputPath -Append
     # List files inside the share
     try {
         $files = Get-ChildItem -Path $sharePath
-
         # Loop through each file in the share
         foreach ($file in $files) {
             # Read the file content and append to Results.txt
             try {
-                $file.FullName | Out-File -FilePath $outputPath -Append
+		$file.FullName | Out-File -FilePath $outputPath -Append
 		Get-Content -Path $file.FullName | Out-File -FilePath $outputPath -Append
                 Write-Host "Appended content from $($file.FullName) to $outputPath"
             } catch {
